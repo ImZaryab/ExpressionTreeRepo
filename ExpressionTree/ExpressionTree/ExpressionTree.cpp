@@ -1,3 +1,9 @@
+/*
+* @author Zaryab Husain Ghori(190899)
+* @date 16-12-20
+* @Lab Assignment # 2
+*/
+
 #include <iostream>
 #include <vector>
 using namespace std;
@@ -8,7 +14,6 @@ public:
 	char data;
 	node* next;
 };
-
 
 class Stack
 {
@@ -77,6 +82,84 @@ char Stack::Top()
 	}
 }
 
+class TreeNode
+{
+public:
+	char value;
+	TreeNode* leftChild;
+	TreeNode* rightChild;
+	TreeNode* next;
+
+	TreeNode()
+	{
+		leftChild = NULL;
+		rightChild = NULL;
+		next = NULL;
+	}
+};
+
+class BinaryTree
+{
+	TreeNode* root;
+
+public:
+	void setRoot(TreeNode* node)
+	{
+		root = node;
+	}
+
+	TreeNode* getRoot()
+	{
+		return root;
+	}
+
+};
+
+class NodeStack
+{
+	TreeNode* Top = NULL;
+
+public:
+	void PushNode(char data);
+	void OprNode(char data);
+	TreeNode* PopNode();
+	TreeNode* getTop()
+	{
+		return Top;
+	}
+};
+
+void NodeStack::PushNode(char data)
+{
+	TreeNode* newptr;
+	newptr = new TreeNode;
+
+	newptr->value = data;
+	newptr->next = Top;
+
+	Top = newptr;
+}
+
+TreeNode* NodeStack::PopNode()
+{
+	TreeNode* temp = Top;
+	Top = Top->next;
+
+	return temp;
+}
+
+void NodeStack::OprNode(char data)
+{
+	TreeNode* newptr;
+	newptr = new TreeNode;
+
+	newptr->value = data;
+	newptr->rightChild = PopNode();
+	newptr->leftChild = PopNode();
+	newptr->next = Top;
+	Top = newptr;
+}
+
 ///////////////////////////////////////////////////////////////////////
 //------------------OPERATOR PRECEDENCE FUNCTION--------------------//
 /////////////////////////////////////////////////////////////////////
@@ -91,9 +174,9 @@ bool prcd(char a, char b)
 		return true;
 	else if ((a == '+' && b == ')') || (a == '-' && b == ')') || (a == '*' && b == ')') || (a == '/' && b == ')'))
 		return true;
-	else if ((a == '+' && b == '(') || (a == '-' && b == '(') || (a == '*' && b == '(') || (a == '/' && b == '('))
+	else if ((a == '+' && b == '(') || (a == '-' && b == '(') || (a == '*' && b == '(') || (a == '/' && b == '(') || (a == ')' && b == '('))
 		return false;
-	else if ((a == '(' && b == '+') || (a == '(' && b == '-') || (a == '(' && b == '*') || (a == '(' && b == '/'))
+	else if ((a == '(' && b == '+') || (a == '(' && b == '-') || (a == '(' && b == '*') || (a == '(' && b == '/') || (a == '(' && b == '(') || (a == ')' && b == ')'))
 		return false;
 	else if ((a == '(' && b == ')'))
 		return false;
@@ -164,18 +247,121 @@ string infixTopostfix(string expression)
 	return postfixExp;
 }
 
+///////////////////////////////////////////////////////////////////////
+//----------------GENERATE EXPRESSION TREE FUNCTION-----------------//
+/////////////////////////////////////////////////////////////////////
+
+BinaryTree generateExpressionTree(string exp)
+{
+	int i = 0;
+	char symb;
+	NodeStack nodestck;
+
+	while (exp[i])
+	{
+		symb = exp[i];
+
+		if (symb != '+' && symb != '-' && symb != '*' && symb != '/' && symb != '(' && symb != ')')
+		{
+			nodestck.PushNode(exp[i]);
+		}
+		if (symb == '+' || symb == '-' || symb == '*' || symb == '/')
+		{
+			nodestck.OprNode(exp[i]);
+		}
+		i++;
+	}
+
+	TreeNode* exptree = nodestck.getTop();
+	BinaryTree BinaryExpressionTree;
+	BinaryExpressionTree.setRoot(exptree);
+
+	return BinaryExpressionTree;
+}
+
+///////////////////////////////////////////////////////////////////////
+//-----------------CHAR TO INT CONVERSION FUNCTION------------------//
+/////////////////////////////////////////////////////////////////////
+
+int convertToInt(char c)
+{
+	int num = int(c) - '0';
+	
+	return num;
+}
+
+///////////////////////////////////////////////////////////////////////
+//----------------EVALUATE EXPRESSION TREE FUNCTION-----------------//
+/////////////////////////////////////////////////////////////////////
+
+int EvaluateExpTree(TreeNode* root)
+{
+	TreeNode* currNode = root;
+
+	if (!currNode)
+	{
+		cout << "Empty Tree!" << endl;
+		return NULL;
+	}
+
+	if (currNode->leftChild == NULL && currNode->rightChild == NULL)
+	{
+		return convertToInt(currNode->value);
+	}
+
+	int leftValue = EvaluateExpTree(currNode->leftChild);
+
+	int rightValue = EvaluateExpTree(currNode->rightChild);
+
+	if (currNode->value == '+')
+	{
+		return leftValue + rightValue;
+	}
+	else if (currNode->value == '-')
+	{
+		return leftValue - rightValue;
+	}
+	else if (currNode->value == '*')
+	{
+		return leftValue * rightValue;
+	}
+	else if (currNode->value == '/')
+	{
+		return leftValue / rightValue;
+	}
+}
+
+///////////////////////////////////////////////////////////////////////
+//----------------------------MAIN BODY-----------------------------//
+/////////////////////////////////////////////////////////////////////
+
 void main()
 {
-	string exp = "(5+3)*4";
+	string exp;
 
-	cout << exp << endl << endl;
+	cout << "Enter Expression without spaces: ";
+	cin >> exp;
+
+	cout << "Given Expression: " << exp << endl << endl;
 
 	string postExp = infixTopostfix(exp);
 	cout << endl;
 
-	cout << postExp << endl << endl;
+	cout << "-Conversion To Infix Completed-" << endl << endl;
 
+	cout << "Converted Expression: " << postExp << endl << endl;
 
+	cout << "Creating Expression Tree..." << endl << endl;
+
+	BinaryTree ExpressionTree = generateExpressionTree(postExp);
+
+	cout << "-Exprssion Tree Created Successfully-" << endl << endl;
+
+	cout << "Evaluating Expression Tree..." << endl << endl;
+
+	int result_of_expTree = EvaluateExpTree(ExpressionTree.getRoot());
+
+	cout << "Result of Expression Tree: " << result_of_expTree << endl << endl;
 
 	system("pause");
 }
