@@ -1,0 +1,4 @@
+﻿  ExpressionTree.cpp
+C:\Users\Zaryab\GitHubRepositories\ExpressionTreeRepo\ExpressionTree\ExpressionTree\ExpressionTree.cpp(168,1): warning C4326: return type of 'main' should be 'int' instead of 'void'
+C:\Users\Zaryab\GitHubRepositories\ExpressionTreeRepo\ExpressionTree\ExpressionTree\ExpressionTree.cpp(100): warning C4715: 'prcd': not all control paths return a value
+  ExpressionTree.vcxproj -> C:\Users\Zaryab\GitHubRepositories\ExpressionTreeRepo\ExpressionTree\Debug\ExpressionTree.exe
